@@ -3,6 +3,8 @@
 -- Host: localhost    Database: friends
 -- ------------------------------------------------------
 -- Server version	5.7.19
+CREATE DATABASE  IF NOT EXISTS `friends` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `friends`;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
