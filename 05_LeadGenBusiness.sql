@@ -69,25 +69,32 @@ GROUP BY a.first_name, a.last_name, month_generated;
 -- the total number of leads generated from each site for all time?
 SELECT CONCAT(a.first_name,' ', a.last_name) as client_name, 
 b.domain_name as website, count(c.leads_id) as number_of_leads 
-FROM clients a, sites b, leads c 
-WHERE a.client_id = b.client_id AND b.site_id=c.site_id  
-AND c.registered_datetime BETWEEN "2011-1-1" AND "2011-12-31"
+FROM clients a LEFT JOIN sites b ON a.client_id = b.client_id 
+	LEFT JOIN leads c ON b.site_id=c.site_id
+WHERE c.registered_datetime BETWEEN "2011-1-1" AND "2011-12-31"
 GROUP BY a.first_name, a.last_name, b.domain_name;
 
 SELECT CONCAT(a.first_name,' ', a.last_name) as client_name, 
 b.domain_name as website, count(c.leads_id) as number_of_leads 
-FROM clients a, sites b, leads c 
-WHERE a.client_id = b.client_id AND b.site_id=c.site_id  
+FROM clients a LEFT JOIN sites b ON a.client_id = b.client_id 
+	LEFT JOIN leads c ON b.site_id=c.site_id
 GROUP BY a.first_name, a.last_name, b.domain_name
 ORDER BY client_name, number_of_leads DESC;
 
+-- 9 Write a single query that retrieves total revenue collected from each client each month 
+-- of the year?
+SELECT CONCAT(a.first_name,' ', a.last_name) AS client_name,
+sum(b.amount) as Total_Revenue,
+date_format(b.charged_datetime, '%M') AS month_charge,
+date_format(b.charged_datetime, '%Y') AS year_charge
+FROM billing b LEFT JOIN clients a on b.client_id = a.client_id
+GROUP BY a.client_id, date_format(b.charged_datetime, '%M'), date_format(b.charged_datetime,'%Y') 
+ORDER BY client_name, year_charge, month_charge;
 
--- 9. Escriba una sola consulta que recupere los ingresos totales recaudados 
--- de cada cliente para cada mes del año. Pídalo por ID de cliente.
-
--- 10. Escriba una sola consulta que recupere todos los sitios que posee 
--- cada cliente. Agrupe los resultados para que cada fila muestre un nuevo 
--- cliente. Se volverá más claro cuando agregue un nuevo campo 
--- llamado 'sitios' que tiene todos los sitios que posee el cliente. 
--- (SUGERENCIA: use GROUP_CONCAT)
- 
+-- 10.Write a single query that retrieves all the sites that each client owns. Group the results 
+-- so that each row shows a new client and have a new field called 'sites' that has all the sites 
+-- that the client owns. (HINT: use GROUP_CONCAT)?
+SELECT concat(a.first_name, ' ' , a.last_name) as client_name, 
+COALESCE(group_concat(b.domain_name separator' / '), 'without websites') as sites
+FROM clients a LEFT JOIN sites b ON a.client_id = b.client_id
+GROUP BY a.client_id;
